@@ -23,3 +23,28 @@ tar -xvf /tmp/sysAdtask1scripts.tar
 #The Tar file has all the scripts
 /root/scripts has all the scripts
 
+Similarly store Dockerfile-webapp, Dockerfile-db and docker-compose.yaml into /root directory
+
+######Setting up local host######
+sudo nano /etc/hosts
+append "<your_server_IP_address> gamma-z.hm" to the file manually
+
+
+#####running server docker in the system##########
+cp Dockerfile-webapp Dockerfile
+docker pull ghcr.io/ameyak04/task2server-ghcr:latest
+docker run -d -t --name task2server ghcr.io/ameyak04/task2server-ghcr:latest
+##########to go into the root of docker##########
+docker exec -it task2server bash
+
+
+#####running database docker in the system##########
+cp Dockerfile-db Dockerfile
+docker pull ghcr.io/ameyak04/postgresdb-ghcr:latest
+docker run -d -t --name postgresdb ghcr.io/ameyak04/postgresdb-ghcr:latest
+##########to go into the root of docker##########
+docker exec -it postgresdb bash
+
+#######to run docker-compose file#######
+docker compose -f docker-compose.yaml up -d ---> Very Important
+
