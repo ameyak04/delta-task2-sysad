@@ -1,11 +1,11 @@
 version: "3"
 services:
-  myappweb:
+  task2server:
     image: ghcr.io/ameyak04/task2server-ghcr:latest
     ports:
       - '80:80'
 
-  mydb:
+  postgresdb:
     image: ghcr.io/ameyak04/postgresdb-ghcr:latest
     environment:
       - POSTGRES_USER=postgres
