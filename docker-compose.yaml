@@ -1,0 +1,15 @@
+version: "3"
+services:
+  myappweb:
+    image: ghcr.io/ameyak04/task2server-ghcr:latest
+    ports:
+      - '80:80'
+
+  mydb:
+    image: ghcr.io/ameyak04/postgresdb-ghcr:latest
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=mysecretpassword
+    ports:
+      - '5432:5432'
+#
