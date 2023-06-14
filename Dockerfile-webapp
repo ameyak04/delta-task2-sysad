@@ -1,0 +1,12 @@
+FROM ubuntu:latest
+RUN mkdir /root/inputfiles
+RUN mkdir /root/scrips
+COPY ./inputfiles /root/inputfiles
+COPY ./scripts /root/scripts
+RUN /root/scripts/genStudent
+RUN /root/scripts/permit
+RUN /root/scripts/messwebsite.sh
+RUN apt update && apt-get install -y apache2
+COPY ./inputfiles/000-default.conf /etc/apache2/sites-available/000-default.conf
+COPY ./inputfiles/mess.txt /var/www/html/gamma-z.hm/mess.txt
+COPY ./inputfiles/index.html /var/www/html/gamma-z.hm/index.html
