@@ -1,0 +1,104 @@
+#!/bin/bash
+
+export PATH=$PATH:/usr/sbin:/usr/bin 
+#####################creating user HAD##################
+echo -e "#####################creating user HAD##################\n\n"
+echo -e "Creating HAD user Please contact System Admin for password \n\n"
+useradd -m -s /bin/bash  HAD 2>/dev/null;echo "HAD:hadpasswd" |  chpasswd
+
+echo -e  " Giving  previlages for HAD user"
+usermod -aG  HAD 2>/dev/null
+chmod 777 /home/HAD
+cp /root/inputfiles/mess.txt /home/HAD
+cp /root/scripts/HADscripts/* /home/HAD
+cp /root/scripts/HADscripts/.bashrc /home/HAD
+chown HAD:HAD /home/HAD/*
+chown HAD:HAD /home/HAD/.bashrc
+chmod 600 /home/HAD/.bashrc
+chmod 666 /home/HAD/mess.txt
+sleep 2
+#####################Choose Options to Generate Student accounts #############
+#echo -e  " ************** Options to generate Student Accounts ******\n\n"
+#echo -e  " Options 1) Account creation through input file in /root/inputfiles/studentDetails.txt "
+#echo -e  " Options 2) Account creation by manual inputs   *\n"
+#echo -e  " choose Option(1/2) : "
+#read Option
+Option=1
+echo $Option
+############# Based on Option Inputs start creating accounts and files ###"
+if [ $Option -eq 1 ]
+then 
+	#Create Directories and files for students 
+	echo -e  " Creating accounts based on /root/inputfiles/studentDetails.txt file \n"
+	awk '{print$1":"$2":"$3":"$4":"$5":"$6":"}' /root/inputfiles/studentDetails.txt > /root/inputfiles/cleanstudentDetails.txt
+	for student in $(cat /root/inputfiles/cleanstudentDetails.txt)
+	do
+	#	echo -e  $student
+	#	sleep 2
+	Name="$(echo -e  $student | awk -F:  '{print $1}')"
+	RollNumber="$(echo -e  $student | awk -F:  '{print $2}')"
+	Hostel="$(echo -e  $student | awk -F:  '{print $3}')"
+	Room="$(echo -e  $student | awk -F:  '{print $4}')"
+	Mess="$(echo -e  $student | awk -F:  '{print $5}')"
+	MessPref="$(echo -e  $student | awk -F:  '{print $6}')"
+	sleep 2
+	awk -F: '{print $1}' /etc/passwd | grep $Hostel
+		if [ $? -eq 0 ]
+		then
+		echo -e  " \n User $Hostel Warden account  already in system"
+	        else
+		echo -e  "\n Creating user for Hostel Warden if not available "
+		useradd  -m  -s /bin/bash $Hostel 2>/dev/null
+		chown $Hostel:$Hostel /home/$Hostel 2>/dev/null
+		chmod 777 /home/$Hostel 2>/dev/null
+		cp /root/scripts/HWscripts/* /home/$Hostel
+		cp /root/scripts/HWscripts/.bashrc /home/$Hostel
+		touch /home/$Hostel/announcements.txt 2>/dev/null
+		chmod 664 /home/$Hostel/announcements.txt
+		 touch /home/$Hostel/feeDefaulters.txt 2>/dev/null
+		 chmod 664 /home/$Hostel/feeDefaulters.txt
+		 chown $Hostel:$Hostel /home/$Hostel/*
+		 chown $Hostel:$Hostel /home/$Hostel/.bashrc
+		 chmod 600 /home/$Hostel/.bashrc
+		 touch /home/$Hostel/Return.txt 2>/dev/null
+		 chmod 666 /home/$Hostel/Return.txt
+		# Add HAD in all the Hostel Groups as he can access all the file across hostels   
+		 usermod -aG $Hostel HAD 
+		fi
+#	# Check if student is already exist in System 
+	grep $RollNumber /etc/passwd
+		if [ $? -eq 0 ]
+		then
+		echo -e  " \n User $Name is already in system"
+	        else
+		echo -e  "\n Creating user $Name"
+		 mkdir /home/$Hostel/$Room 2>/dev/null
+		 mkdir /home/$Hostel/$Room/$Name 2>/dev/null
+		 useradd -u $RollNumber -m -d /home/$Hostel/$Room/$Name -s /bin/bash  $Name 2>/dev/null
+		 chown  "$Hostel":"$Hostel" /home/$Hostel 2>/dev/null
+		 chown  "$Hostel":"$Hostel" /home/$Hostel/$Room 2>/dev/null
+		 chown -R "$Name":"$Hostel" /home/$Hostel/$Room/$Name 2>/dev/null
+		 cp /root/scripts/studentscripts/* /home/$Hostel/$Room/$Name
+		 cp /root/scripts/studentscripts/.bashrc /home/$Hostel/$Room/$Name
+		 chown  "$Name":"$Hostel" /home/$Hostel/$Room/$Name/* 2>/dev/null
+		 chown  "$Name":"$Hostel" /home/$Hostel/$Room/$Name/.bashrc 2>/dev/null
+		 touch /home/$Hostel/$Room/$Name/userDetails.txt 2>/dev/null
+		 chown  "$Name":"$Hostel" /home/$Hostel/$Room/$Name/userDetails.txt 2>/dev/null
+		 chmod 664 /home/$Hostel/$Room/$Name/userDetails.txt 
+#		echo -e  $Name":"$RollNumber":"$Hostel":"$Room":"$Mess":"$MessPref":">>/home/$Hostel/$Room/$Name/userDetails.txt
+		echo -e  "Name  is :"$Name>/home/$Hostel/$Room/$Name/userDetails.txt
+		echo -e  "RollNumber is :"$RollNumber>>/home/$Hostel/$Room/$Name/userDetails.txt
+		echo -e  "Hostel is :"$Hostel>>/home/$Hostel/$Room/$Name/userDetails.txt
+		echo -e  "Room  is :"$Room>>/home/$Hostel/$Room/$Name/userDetails.txt
+		echo -e  "Mess is :"$Mess>>/home/$Hostel/$Room/$Name/userDetails.txt
+		echo -e  "MessPref is :"$MessPref>>/home/$Hostel/$Room/$Name/userDetails.txt
+		echo -e  "Department is :">>/home/$Hostel/$Room/$Name/userDetails.txt
+		echo -e  "Year  is :">>/home/$Hostel/$Room/$Name/userDetails.txt
+		echo -e  "Month  is :">>/home/$Hostel/$Room/$Name/userDetails.txt
+		 touch /home/$Hostel/$Room/$Name/fees.txt 2>/dev/null
+		 chmod 664 /home/$Hostel/$Room/$Name/fees.txt 
+		 chown  "$Name":"$Hostel" /home/$Hostel/$Room/$Name/fees.txt 2>/dev/null
+	        fi	
+	
+	done  
+fi
