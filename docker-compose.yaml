@@ -1,4 +1,4 @@
-version: "3"
+version: "2.20.2"
 services:
   task2server:
     image: ghcr.io/ameyak04/task2server-ghcr:latest
