@@ -2,6 +2,8 @@ version: "3"
 services:
   task2server:
     image: ghcr.io/ameyak04/task2server-ghcr:latest
+    tty: true
+    stdin_open: true
     ports:
       - '80:80'
 
